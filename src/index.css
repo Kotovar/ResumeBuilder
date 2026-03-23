@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+:root {
+  --accent: #2563eb;
+  --resume-font: 'Inter', sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Print target ─────────────────────────────────────────
+   #resume-print-container lives in index.html as a permanent
+   sibling of #root. App.tsx portals the live template into it
+   (see App.tsx / useExport.ts). Hidden on screen, shown when
+   printing; #root is hidden so only the resume renders.
+   ─────────────────────────────────────────────────────── */
+#resume-print-container {
+  display: none;
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  #root {
+    display: none !important;
+  }
+
+  #resume-print-container {
+    display: block !important;
+    width: 210mm !important;
+    margin: 0 !important;
+  }
+}
