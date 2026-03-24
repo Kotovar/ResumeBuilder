@@ -302,6 +302,14 @@ export function ModernPDF({ data }: Props) {
             value: personal.github,
             href: ensureHttps(personal.github),
         });
+    if (personal.telegram)
+        contactEntries.push({
+            label: t.personal.telegram,
+            value: personal.telegram,
+            href: personal.telegram.startsWith("@")
+                ? `https://t.me/${personal.telegram.slice(1)}`
+                : `https://t.me/${personal.telegram}`,
+        });
     if (personal.salary?.amount)
         contactEntries.push({
             label: t.personal.salary,

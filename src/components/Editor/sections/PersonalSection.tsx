@@ -177,6 +177,12 @@ export function PersonalSection() {
                     onChange={upd("github")}
                     placeholder={p.phGithub}
                 />
+                <FormField
+                    label={p.telegram}
+                    value={personal.telegram}
+                    onChange={upd("telegram")}
+                    placeholder={p.phTelegram}
+                />
 
                 <div className="flex flex-col gap-1">
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">

@@ -33,6 +33,7 @@ export interface PersonalInfo {
     website: string;
     linkedin: string;
     github: string;
+    telegram: string;
     /** Base64-encoded profile photo (jpeg/png) */
     photo?: string;
     salary?: SalaryExpectation;

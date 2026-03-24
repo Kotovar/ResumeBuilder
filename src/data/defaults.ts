@@ -12,6 +12,7 @@ export function createDefaultResume(): ResumeData {
             website: "alexjohnson.dev",
             linkedin: "linkedin.com/in/alexjohnson",
             github: "github.com/alexjohnson",
+            telegram: "@alexjohnson",
         },
         summary:
             "Experienced software engineer with 8+ years building scalable web applications. " +

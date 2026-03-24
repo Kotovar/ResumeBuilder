@@ -89,6 +89,15 @@ export function ModernTemplate() {
                     : `https://${personal.github}`
                 : undefined,
         },
+        {
+            label: t.personal.telegram,
+            value: personal.telegram,
+            href: personal.telegram
+                ? personal.telegram.startsWith("@")
+                    ? `https://t.me/${personal.telegram.slice(1)}`
+                    : `https://t.me/${personal.telegram}`
+                : undefined,
+        },
         ...(personal.salary?.amount
             ? [
                   {

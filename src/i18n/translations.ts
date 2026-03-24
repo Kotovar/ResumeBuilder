@@ -26,6 +26,7 @@ export interface Translations {
         website: string;
         linkedin: string;
         github: string;
+        telegram: string;
         photo: string;
         photoUpload: string;
         photoReplace: string;
@@ -42,6 +43,7 @@ export interface Translations {
         phWebsite: string;
         phLinkedin: string;
         phGithub: string;
+        phTelegram: string;
     };
     summary: {
         label: string;
@@ -154,6 +156,7 @@ const en: Translations = {
         website: "Website",
         linkedin: "LinkedIn",
         github: "GitHub",
+        telegram: "Telegram",
         photo: "Profile Photo",
         photoUpload: "Upload Photo",
         photoReplace: "Replace",
@@ -170,6 +173,7 @@ const en: Translations = {
         phWebsite: "yoursite.com",
         phLinkedin: "linkedin.com/in/you",
         phGithub: "github.com/you",
+        phTelegram: "@yourusername",
     },
     summary: {
         label: "Professional Summary",
@@ -299,6 +303,7 @@ const ru: Translations = {
         website: "Сайт",
         linkedin: "LinkedIn",
         github: "GitHub",
+        telegram: "Telegram",
         photo: "Фото профиля",
         photoUpload: "Загрузить фото",
         photoReplace: "Заменить",
@@ -315,6 +320,7 @@ const ru: Translations = {
         phWebsite: "yoursite.ru",
         phLinkedin: "linkedin.com/in/ivan",
         phGithub: "github.com/ivan",
+        phTelegram: "@username",
     },
     summary: {
         label: "Краткое описание",

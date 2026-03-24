@@ -270,6 +270,13 @@ export function ClassicPDF({ data }: Props) {
             label: personal.github,
             href: ensureHttps(personal.github),
         });
+    if (personal.telegram)
+        contactItems.push({
+            label: personal.telegram,
+            href: personal.telegram.startsWith("@")
+                ? `https://t.me/${personal.telegram.slice(1)}`
+                : `https://t.me/${personal.telegram}`,
+        });
     if (personal.salary?.amount) {
         const salaryLabel = t.personal.salary;
         const salaryFormatted = formatSalary(

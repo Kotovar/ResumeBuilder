@@ -295,6 +295,18 @@ export function ClassicTemplate() {
                                 {personal.github}
                             </a>
                         )}
+                        {personal.telegram && (
+                            <a
+                                href={
+                                    personal.telegram.startsWith("@")
+                                        ? `https://t.me/${personal.telegram.slice(1)}`
+                                        : `https://t.me/${personal.telegram}`
+                                }
+                                className="text-[10px] text-gray-500"
+                            >
+                                {personal.telegram}
+                            </a>
+                        )}
                         {personal.salary?.amount ? (
                             <span className="text-[10px] text-gray-500">
                                 {t.personal.salary}:{" "}
