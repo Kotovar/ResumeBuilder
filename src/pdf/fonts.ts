@@ -7,88 +7,43 @@ export function registerPDFFonts(): void {
     if (registered) return;
     registered = true;
 
-    Font.register({
-        family: "Inter",
-        fonts: [
-            {
-                src: "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/inter/static/Inter-Regular.ttf",
-                fontStyle: "normal",
-                fontWeight: 400,
-            },
-            {
-                src: "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/inter/static/Inter-Medium.ttf",
-                fontStyle: "normal",
-                fontWeight: 500,
-            },
-            {
-                src: "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/inter/static/Inter-SemiBold.ttf",
-                fontStyle: "normal",
-                fontWeight: 600,
-            },
-            {
-                src: "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/inter/static/Inter-Bold.ttf",
-                fontStyle: "normal",
-                fontWeight: 700,
-            },
-        ],
-    });
-
+    // PT Sans - sans-serif, humanist, excellent Cyrillic support
     Font.register({
         family: "PT Sans",
         fonts: [
             {
-                src: "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/ptsans/PT_Sans-Web-Regular.ttf",
+                src: "/fonts/PT_Sans-Web-Regular.ttf",
                 fontWeight: 400,
             },
             {
-                src: "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/ptsans/PT_Sans-Web-Bold.ttf",
+                src: "/fonts/PT_Sans-Web-Bold.ttf",
                 fontWeight: 700,
             },
         ],
     });
 
+    // PT Serif - serif, humanist, excellent Cyrillic support
     Font.register({
         family: "PT Serif",
         fonts: [
             {
-                src: "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/ptserif/PT_Serif-Web-Regular.ttf",
+                src: "/fonts/PT_Serif-Web-Regular.ttf",
                 fontWeight: 400,
             },
             {
-                src: "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/ptserif/PT_Serif-Web-Bold.ttf",
+                src: "/fonts/PT_Serif-Web-Bold.ttf",
                 fontWeight: 700,
             },
         ],
     });
 
+    // PT Mono - monospace, technical, excellent Cyrillic support
     Font.register({
-        family: "Roboto",
+        family: "PT Mono",
         fonts: [
             {
-                src: "https://cdn.jsdelivr.net/gh/google/fonts@main/apache/roboto/static/Roboto-Regular.ttf",
+                src: "/fonts/PT_Mono-Regular.ttf",
                 fontWeight: 400,
-            },
-            {
-                src: "https://cdn.jsdelivr.net/gh/google/fonts@main/apache/roboto/static/Roboto-Medium.ttf",
-                fontWeight: 500,
-            },
-            {
-                src: "https://cdn.jsdelivr.net/gh/google/fonts@main/apache/roboto/static/Roboto-Bold.ttf",
-                fontWeight: 700,
-            },
-        ],
-    });
-
-    Font.register({
-        family: "Lora",
-        fonts: [
-            {
-                src: "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/lora/static/Lora-Regular.ttf",
-                fontWeight: 400,
-            },
-            {
-                src: "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/lora/static/Lora-Bold.ttf",
-                fontWeight: 700,
             },
         ],
     });
@@ -97,9 +52,7 @@ export function registerPDFFonts(): void {
 }
 
 export const PDF_FONT_FAMILY: Record<FontFamily, string> = {
-    inter: "Inter",
     ptsans: "PT Sans",
     ptserif: "PT Serif",
-    roboto: "Roboto",
-    lora: "Lora",
+    ptmono: "PT Mono",
 };
