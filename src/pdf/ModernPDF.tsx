@@ -17,7 +17,7 @@ import type {
 import { ACCENT_HEX, computeResumeColors, type ResumeColors } from "./colors";
 import { PDF_FONT_FAMILY } from "./fonts";
 import { getT } from "../i18n/translations";
-import { fmtDate, formatSalary } from "../components/Preview/templates/shared";
+import { formatSalary } from "../components/Preview/templates/shared";
 
 interface Props {
     data: ResumeData;
@@ -30,9 +30,17 @@ function localDateRange(
     end: string,
     current: boolean,
     presentLabel: string,
+    lang: "en" | "ru",
 ): string {
-    const s = fmtDate(start);
-    const e = current ? presentLabel : fmtDate(end);
+    const t = getT(lang);
+    const s = start
+        ? `${t.months.short[parseInt(start.split("-")[1], 10) - 1]} ${start.split("-")[0]}`
+        : "";
+    const e = current
+        ? presentLabel
+        : end
+          ? `${t.months.short[parseInt(end.split("-")[1], 10) - 1]} ${end.split("-")[0]}`
+          : "";
     if (!s && !e) return "";
     if (!s) return e;
     if (!e) return s;
@@ -443,6 +451,7 @@ export function ModernPDF({ data }: Props) {
                                                 edu.endDate,
                                                 false,
                                                 t.experience.present,
+                                                settings.lang,
                                             ),
                                             edu.location,
                                         ]
@@ -498,6 +507,7 @@ export function ModernPDF({ data }: Props) {
                                                     exp.endDate,
                                                     exp.current,
                                                     t.experience.present,
+                                                    settings.lang,
                                                 ),
                                                 exp.location,
                                             ]

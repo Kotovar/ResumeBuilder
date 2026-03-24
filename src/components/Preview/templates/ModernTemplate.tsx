@@ -96,11 +96,16 @@ export function ModernTemplate() {
                 : undefined,
         },
         ...(personal.salary?.amount
-            ? [{
-                label: t.personal.salary,
-                value: formatSalary(personal.salary.amount, personal.salary.currency),
-                href: undefined,
-            }]
+            ? [
+                  {
+                      label: t.personal.salary,
+                      value: formatSalary(
+                          personal.salary.amount,
+                          personal.salary.currency,
+                      ),
+                      href: undefined,
+                  },
+              ]
             : []),
     ].filter(({ value }) => value);
 
@@ -258,7 +263,10 @@ export function ModernTemplate() {
                 {isVisible("summary") && summary && (
                     <section>
                         <MainHeader title={t.sections.summary} />
-                        <p className="text-[11px] leading-relaxed text-gray-700" style={{ whiteSpace: 'pre-line' }}>
+                        <p
+                            className="text-[11px] leading-relaxed text-gray-700"
+                            style={{ whiteSpace: "pre-line" }}
+                        >
                             {summary}
                         </p>
                     </section>
@@ -286,6 +294,8 @@ export function ModernTemplate() {
                                             exp.startDate,
                                             exp.endDate,
                                             exp.current,
+                                            t.experience.present,
+                                            settings.lang,
                                         )}
                                     </span>
                                 </div>
