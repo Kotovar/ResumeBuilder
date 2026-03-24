@@ -5,7 +5,15 @@ import { TagInput } from '../ui/TagInput';
 import { TipBox } from '../ui/TipBox';
 import type { SkillGroup } from '../../../types/resume';
 
-function SkillGroupCard({ group }: { group: SkillGroup }) {
+interface CardProps {
+  group: SkillGroup;
+  index: number;
+  total: number;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+}
+
+function SkillGroupCard({ group, index, total, onMoveUp, onMoveDown }: CardProps) {
   const { updateSkillGroup, removeSkillGroup } = useResumeStore();
   const t = useT().skills;
   const upd = (data: Partial<SkillGroup>) => updateSkillGroup(group.id, data);
@@ -13,6 +21,32 @@ function SkillGroupCard({ group }: { group: SkillGroup }) {
   return (
     <div className="border border-gray-200 rounded-lg p-3 flex flex-col gap-3 bg-white">
       <div className="flex items-end gap-2">
+        {/* Category up/down */}
+        <div className="flex flex-col gap-0.5 shrink-0 pb-1">
+          <button
+            type="button"
+            onClick={onMoveUp}
+            disabled={index === 0}
+            className="cursor-pointer w-5 h-5 flex items-center justify-center text-gray-300
+              hover:text-gray-500 disabled:opacity-20 disabled:cursor-default rounded
+              transition-colors text-xs leading-none"
+            title="Move up"
+          >
+            ↑
+          </button>
+          <button
+            type="button"
+            onClick={onMoveDown}
+            disabled={index === total - 1}
+            className="cursor-pointer w-5 h-5 flex items-center justify-center text-gray-300
+              hover:text-gray-500 disabled:opacity-20 disabled:cursor-default rounded
+              transition-colors text-xs leading-none"
+            title="Move down"
+          >
+            ↓
+          </button>
+        </div>
+
         <div className="flex-1">
           <FormField
             label={t.category}
@@ -21,6 +55,7 @@ function SkillGroupCard({ group }: { group: SkillGroup }) {
             placeholder={t.phCategory}
           />
         </div>
+
         <button
           type="button"
           onClick={() => removeSkillGroup(group.id)}
@@ -30,18 +65,20 @@ function SkillGroupCard({ group }: { group: SkillGroup }) {
           {t.removeButton}
         </button>
       </div>
+
       <TagInput
         label={t.skillsLabel}
         tags={group.skills}
         onChange={(skills) => upd({ skills })}
         placeholder={t.phSkills}
+        sortable
       />
     </div>
   );
 }
 
 export function SkillsSection() {
-  const { skills, addSkillGroup } = useResumeStore();
+  const { skills, addSkillGroup, reorderSkillGroups } = useResumeStore();
   const t = useT().skills;
 
   return (
@@ -49,8 +86,15 @@ export function SkillsSection() {
       <TipBox>{t.tip}</TipBox>
 
       <div className="flex flex-col gap-2">
-        {skills.map((group) => (
-          <SkillGroupCard key={group.id} group={group} />
+        {skills.map((group, index) => (
+          <SkillGroupCard
+            key={group.id}
+            group={group}
+            index={index}
+            total={skills.length}
+            onMoveUp={() => reorderSkillGroups(index, index - 1)}
+            onMoveDown={() => reorderSkillGroups(index, index + 1)}
+          />
         ))}
       </div>
 
