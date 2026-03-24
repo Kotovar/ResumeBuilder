@@ -19,3 +19,10 @@ export function dateRange(start: string, end: string, current: boolean): string 
   if (!e) return s;
   return `${s} – ${e}`;
 }
+
+/** Format salary amount + currency, e.g. "$2,000" or "150 000 ₽" */
+export function formatSalary(amount: number, currency: 'RUB' | 'USD'): string {
+  if (!amount) return '';
+  if (currency === 'RUB') return amount.toLocaleString('ru-RU') + '\u00a0₽';
+  return '$' + amount.toLocaleString('en-US');
+}

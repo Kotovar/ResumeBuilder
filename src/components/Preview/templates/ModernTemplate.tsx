@@ -1,6 +1,6 @@
 import { useResumeStore } from "../../../store/resumeStore";
 import { getT } from "../../../i18n/translations";
-import { dateRange } from "./shared";
+import { dateRange, formatSalary } from "./shared";
 
 const FONT_STACK: Record<string, string> = {
     inter: "'Inter', sans-serif",
@@ -95,6 +95,13 @@ export function ModernTemplate() {
                     : `https://${personal.github}`
                 : undefined,
         },
+        ...(personal.salary?.amount
+            ? [{
+                label: t.personal.salary,
+                value: formatSalary(personal.salary.amount, personal.salary.currency),
+                href: undefined,
+            }]
+            : []),
     ].filter(({ value }) => value);
 
     return (
@@ -115,6 +122,21 @@ export function ModernTemplate() {
                     printColorAdjust: "exact",
                 }}
             >
+                {/* Photo */}
+                {personal.photo && (
+                    <img
+                        src={personal.photo}
+                        alt="profile"
+                        style={{
+                            width: 100,
+                            height: 100,
+                            borderRadius: 6,
+                            objectFit: "cover",
+                            // alignSelf: "center",
+                        }}
+                    />
+                )}
+
                 {/* Name & title */}
                 <div>
                     <h1
@@ -236,7 +258,7 @@ export function ModernTemplate() {
                 {isVisible("summary") && summary && (
                     <section>
                         <MainHeader title={t.sections.summary} />
-                        <p className="text-[11px] leading-relaxed text-gray-700">
+                        <p className="text-[11px] leading-relaxed text-gray-700" style={{ whiteSpace: 'pre-line' }}>
                             {summary}
                         </p>
                     </section>

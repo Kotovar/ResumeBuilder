@@ -4,6 +4,7 @@ import {
     View,
     Text,
     Link,
+    Image,
     StyleSheet,
 } from "@react-pdf/renderer";
 import type {
@@ -16,7 +17,7 @@ import type {
 import { ACCENT_HEX, computeResumeColors, type ResumeColors } from "./colors";
 import { PDF_FONT_FAMILY } from "./fonts";
 import { getT } from "../i18n/translations";
-import { fmtDate } from "../components/Preview/templates/shared";
+import { fmtDate, formatSalary } from "../components/Preview/templates/shared";
 
 interface Props {
     data: ResumeData;
@@ -44,6 +45,14 @@ function ensureHttps(url: string): string {
     return `https://${url}`;
 }
 
+function isSafePhoto(photo: string | undefined): boolean {
+    return (
+        typeof photo === "string" &&
+        (photo.startsWith("data:image/jpeg;base64,") ||
+            photo.startsWith("data:image/png;base64,"))
+    );
+}
+
 function makeStyles(colors: ResumeColors, fontFamily: string) {
     const { accent, sidebarBg, sidebarHeaderText, mainBorder, skillTagBg } =
         colors;
@@ -53,23 +62,32 @@ function makeStyles(colors: ResumeColors, fontFamily: string) {
             fontSize: 9,
             color: "#1a1a1a",
             flexDirection: "row",
+            paddingTop: 24,
+            paddingBottom: 24,
         },
-        // Fixed sidebar background
+        // Fixed sidebar background — explicit A4 height (841.89pt) because
+        // height:"100%" resolves to the content area (page minus padding),
+        // leaving a gap equal to paddingBottom at the bottom of every page.
         sidebarBgFixed: {
             position: "absolute",
             top: 0,
             left: 0,
             width: SIDEBAR_WIDTH,
-            height: "100%",
+            height: 900,
             backgroundColor: sidebarBg,
         },
         // Sidebar content column
         sidebar: {
             width: SIDEBAR_WIDTH,
-            paddingTop: 24,
-            paddingBottom: 24,
             paddingLeft: 14,
             paddingRight: 14,
+        },
+        sidebarPhoto: {
+            width: 60,
+            height: 60,
+            borderRadius: 4,
+            alignSelf: "center",
+            marginBottom: 10,
         },
         sidebarName: {
             fontSize: 14,
@@ -155,8 +173,6 @@ function makeStyles(colors: ResumeColors, fontFamily: string) {
         // Main content
         main: {
             flex: 1,
-            paddingTop: 24,
-            paddingBottom: 24,
             paddingLeft: 20,
             paddingRight: 20,
         },
@@ -303,6 +319,14 @@ export function ModernPDF({ data }: Props) {
             value: personal.github,
             href: ensureHttps(personal.github),
         });
+    if (personal.salary?.amount)
+        contactEntries.push({
+            label: t.personal.salary,
+            value: formatSalary(
+                personal.salary.amount,
+                personal.salary.currency,
+            ),
+        });
 
     // All skills across groups (for sidebar tag display)
     const allSkillGroups = data.skills;
@@ -310,11 +334,13 @@ export function ModernPDF({ data }: Props) {
     return (
         <Document>
             <Page size="A4" style={S.page}>
-                {/* Fixed sidebar background — appears on all pages */}
+                {/* Sidebar background — fixed so it repeats on every page */}
                 <View fixed style={S.sidebarBgFixed} />
-
                 {/* Sidebar content */}
                 <View style={S.sidebar}>
+                    {isSafePhoto(personal.photo) ? (
+                        <Image src={personal.photo!} style={S.sidebarPhoto} />
+                    ) : null}
                     {personal.fullName ? (
                         <Text style={S.sidebarName}>{personal.fullName}</Text>
                     ) : null}
@@ -427,7 +453,6 @@ export function ModernPDF({ data }: Props) {
                         </>
                     )}
                 </View>
-
                 {/* Main content */}
                 <View style={S.main}>
                     {/* Summary */}
@@ -436,7 +461,11 @@ export function ModernPDF({ data }: Props) {
                             <Text style={S.mainSectionHeader}>
                                 {t.sections.summary.toUpperCase()}
                             </Text>
-                            <Text style={S.summaryText}>{data.summary}</Text>
+                            {data.summary.split("\n").map((line, i) => (
+                                <Text key={i} style={S.summaryText}>
+                                    {line}
+                                </Text>
+                            ))}
                         </>
                     )}
 
@@ -447,11 +476,7 @@ export function ModernPDF({ data }: Props) {
                                 {t.sections.experience.toUpperCase()}
                             </Text>
                             {data.experience.map((exp: ExperienceEntry) => (
-                                <View
-                                    key={exp.id}
-                                    style={S.expItem}
-                                    wrap={false}
-                                >
+                                <View key={exp.id} style={S.expItem}>
                                     <View style={S.expTopRow}>
                                         <Text style={S.expPosition}>
                                             {exp.position}
@@ -511,11 +536,7 @@ export function ModernPDF({ data }: Props) {
                                 {t.sections.projects.toUpperCase()}
                             </Text>
                             {data.projects.map((proj: ProjectEntry) => (
-                                <View
-                                    key={proj.id}
-                                    style={S.projectItem}
-                                    wrap={false}
-                                >
+                                <View key={proj.id} style={S.projectItem}>
                                     <View style={S.projectTopRow}>
                                         <Text style={S.projectName}>
                                             {proj.name}

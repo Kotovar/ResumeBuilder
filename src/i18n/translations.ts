@@ -27,6 +27,14 @@ export interface Translations {
     website: string;
     linkedin: string;
     github: string;
+    photo: string;
+    photoUpload: string;
+    photoReplace: string;
+    photoRemove: string;
+    salary: string;
+    salaryAmount: string;
+    salaryCurrency: string;
+    salaryPlaceholder: string;
     phName: string;
     phTitle: string;
     phEmail: string;
@@ -143,6 +151,14 @@ const en: Translations = {
     website:  'Website',
     linkedin: 'LinkedIn',
     github:   'GitHub',
+    photo:           'Profile Photo',
+    photoUpload:     'Upload Photo',
+    photoReplace:    'Replace',
+    photoRemove:     'Remove',
+    salary:          'Salary',
+    salaryAmount:    'Expected Salary',
+    salaryCurrency:  'Currency',
+    salaryPlaceholder: '2000',
     phName:     'Jane Smith',
     phTitle:    'Senior Software Engineer',
     phEmail:    'jane@example.com',
@@ -261,6 +277,14 @@ const ru: Translations = {
     website:  'Сайт',
     linkedin: 'LinkedIn',
     github:   'GitHub',
+    photo:           'Фото профиля',
+    photoUpload:     'Загрузить фото',
+    photoReplace:    'Заменить',
+    photoRemove:     'Удалить',
+    salary:          'Зарплата',
+    salaryAmount:    'Ожидаемая зарплата',
+    salaryCurrency:  'Валюта',
+    salaryPlaceholder: '150000',
     phName:     'Иван Иванов',
     phTitle:    'Старший разработчик',
     phEmail:    'ivan@example.com',

@@ -1,6 +1,6 @@
 import { useResumeStore } from '../../../store/resumeStore';
 import { getT } from '../../../i18n/translations';
-import { dateRange } from './shared';
+import { dateRange, formatSalary } from './shared';
 
 const FONT_STACK: Record<string, string> = {
   inter:   "'Inter', sans-serif",
@@ -34,7 +34,7 @@ export function ClassicTemplate() {
         return (
           <section key="summary" className="mb-4">
             <SectionHeader title={t.sections.summary} />
-            <p className="text-[11px] leading-relaxed text-gray-700">{summary}</p>
+            <p className="text-[11px] leading-relaxed text-gray-700" style={{ whiteSpace: 'pre-line' }}>{summary}</p>
           </section>
         );
 
@@ -183,23 +183,37 @@ export function ClassicTemplate() {
       }}
     >
       {/* Header */}
-      <header className="mb-5">
-        <h1 className="text-[26px] font-bold text-gray-900 leading-tight tracking-tight">
-          {personal.fullName || 'Your Name'}
-        </h1>
-        {personal.title && (
-          <p className="text-[13px] font-medium mt-0.5" style={{ color: 'var(--accent)' }}>
-            {personal.title}
-          </p>
-        )}
-        <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2">
-          {personal.email    && <a href={`mailto:${personal.email}`}    className="text-[10px] text-gray-500">{personal.email}</a>}
-          {personal.phone    && <a href={`tel:${personal.phone}`}       className="text-[10px] text-gray-500">{personal.phone}</a>}
-          {personal.location && <span className="text-[10px] text-gray-500">{personal.location}</span>}
-          {personal.website  && <a href={personal.website.startsWith('http') ? personal.website : `https://${personal.website}`}  className="text-[10px] text-gray-500">{personal.website}</a>}
-          {personal.linkedin && <a href={personal.linkedin.startsWith('http') ? personal.linkedin : `https://${personal.linkedin}`} className="text-[10px] text-gray-500">{personal.linkedin}</a>}
-          {personal.github   && <a href={personal.github.startsWith('http') ? personal.github : `https://${personal.github}`}    className="text-[10px] text-gray-500">{personal.github}</a>}
+      <header className="mb-5 flex items-start justify-between gap-4">
+        <div className="flex-1 min-w-0">
+          <h1 className="text-[26px] font-bold text-gray-900 leading-tight tracking-tight">
+            {personal.fullName || 'Your Name'}
+          </h1>
+          {personal.title && (
+            <p className="text-[13px] font-medium mt-0.5" style={{ color: 'var(--accent)' }}>
+              {personal.title}
+            </p>
+          )}
+          <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2">
+            {personal.email    && <a href={`mailto:${personal.email}`}    className="text-[10px] text-gray-500">{personal.email}</a>}
+            {personal.phone    && <a href={`tel:${personal.phone}`}       className="text-[10px] text-gray-500">{personal.phone}</a>}
+            {personal.location && <span className="text-[10px] text-gray-500">{personal.location}</span>}
+            {personal.website  && <a href={personal.website.startsWith('http') ? personal.website : `https://${personal.website}`}  className="text-[10px] text-gray-500">{personal.website}</a>}
+            {personal.linkedin && <a href={personal.linkedin.startsWith('http') ? personal.linkedin : `https://${personal.linkedin}`} className="text-[10px] text-gray-500">{personal.linkedin}</a>}
+            {personal.github   && <a href={personal.github.startsWith('http') ? personal.github : `https://${personal.github}`}    className="text-[10px] text-gray-500">{personal.github}</a>}
+            {personal.salary?.amount ? (
+              <span className="text-[10px] text-gray-500">
+                {t.personal.salary}: {formatSalary(personal.salary.amount, personal.salary.currency)}
+              </span>
+            ) : null}
+          </div>
         </div>
+        {personal.photo && (
+          <img
+            src={personal.photo}
+            alt="profile"
+            style={{ width: 88, height: 88, borderRadius: 6, objectFit: 'cover', flexShrink: 0 }}
+          />
+        )}
       </header>
 
       <hr className="border-0 border-t border-gray-200 mb-4" />

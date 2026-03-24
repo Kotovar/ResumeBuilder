@@ -17,6 +17,13 @@ export type AccentColor  = 'blue' | 'green' | 'purple' | 'rose' | 'slate';
 export type FontFamily   = 'inter' | 'ptsans' | 'roboto' | 'lora' | 'ptserif';
 
 // ── Resume sections data ──────────────────────────────────
+export type SalaryCurrency = 'RUB' | 'USD';
+
+export interface SalaryExpectation {
+  amount:   number;
+  currency: SalaryCurrency;
+}
+
 export interface PersonalInfo {
   fullName:  string;
   title:     string;
@@ -26,6 +33,9 @@ export interface PersonalInfo {
   website:   string;
   linkedin:  string;
   github:    string;
+  /** Base64-encoded profile photo (jpeg/png) */
+  photo?:    string;
+  salary?:   SalaryExpectation;
 }
 
 export interface ExperienceEntry {
