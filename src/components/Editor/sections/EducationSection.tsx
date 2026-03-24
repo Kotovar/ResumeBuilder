@@ -6,15 +6,15 @@ import type { EducationEntry } from "@type/resume";
 
 function EducationCard({ entry }: { entry: EducationEntry }) {
     const { updateEducation, removeEducation } = useResumeStore();
-    const t = useT().education;
+    const t = useT();
     const [open, setOpen] = useState(!entry.institution);
     const upd = (data: Partial<EducationEntry>) =>
         updateEducation(entry.id, data);
 
     const headline =
         entry.degree && entry.field
-            ? `${entry.degree} in ${entry.field}`
-            : entry.degree || t.newDegree;
+            ? `${entry.degree} ${t.education.in} ${entry.field}`
+            : entry.degree || t.education.newDegree;
 
     return (
         <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
@@ -43,7 +43,7 @@ function EducationCard({ entry }: { entry: EducationEntry }) {
                     className="cursor-pointer text-xs text-gray-300 hover:text-red-400 px-1.5 py-0.5
             rounded transition-colors shrink-0"
                 >
-                    {t.removeButton}
+                    {t.education.removeButton}
                 </button>
                 <span className="text-gray-300 text-xs select-none">
                     {open ? "▲" : "▼"}
@@ -55,44 +55,44 @@ function EducationCard({ entry }: { entry: EducationEntry }) {
                     <div className="grid grid-cols-2 gap-3">
                         <div className="col-span-2">
                             <FormField
-                                label={t.institution}
+                                label={t.education.institution}
                                 value={entry.institution}
                                 onChange={(v) => upd({ institution: v })}
-                                placeholder={t.phInstitution}
+                                placeholder={t.education.phInstitution}
                             />
                         </div>
                         <FormField
-                            label={t.degree}
+                            label={t.education.degree}
                             value={entry.degree}
                             onChange={(v) => upd({ degree: v })}
-                            placeholder={t.phDegree}
+                            placeholder={t.education.phDegree}
                         />
                         <FormField
-                            label={t.field}
+                            label={t.education.field}
                             value={entry.field}
                             onChange={(v) => upd({ field: v })}
-                            placeholder={t.phField}
+                            placeholder={t.education.phField}
                         />
                         <FormField
-                            label={t.location}
+                            label={t.education.location}
                             value={entry.location}
                             onChange={(v) => upd({ location: v })}
-                            placeholder={t.phLocation}
+                            placeholder={t.education.phLocation}
                         />
                         <FormField
-                            label={t.gpa}
+                            label={t.education.gpa}
                             value={entry.gpa}
                             onChange={(v) => upd({ gpa: v })}
                             placeholder="3.9"
                         />
                         <FormField
-                            label={t.startDate}
+                            label={t.education.startDate}
                             value={entry.startDate}
                             onChange={(v) => upd({ startDate: v })}
                             placeholder="2014-09"
                         />
                         <FormField
-                            label={t.endDate}
+                            label={t.education.endDate}
                             value={entry.endDate}
                             onChange={(v) => upd({ endDate: v })}
                             placeholder="2018-05"
@@ -106,7 +106,7 @@ function EducationCard({ entry }: { entry: EducationEntry }) {
 
 export function EducationSection() {
     const { education, addEducation } = useResumeStore();
-    const t = useT().education;
+    const t = useT();
 
     return (
         <div className="flex flex-col gap-4">
@@ -123,7 +123,7 @@ export function EducationSection() {
           border-2 border-dashed border-gray-200 rounded-lg text-sm text-gray-400
           hover:border-gray-300 hover:text-gray-600 transition-colors"
             >
-                {t.addButton}
+                {t.education.addButton}
             </button>
         </div>
     );

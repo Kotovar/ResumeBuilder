@@ -116,9 +116,9 @@ export function ClassicTemplate() {
                                 <div className="flex justify-between items-baseline">
                                     <div>
                                         <span className="text-[12px] font-semibold text-gray-900">
-                                            {[edu.degree, edu.field]
-                                                .filter(Boolean)
-                                                .join(" · ")}
+                                            {edu.degree && edu.field
+                                                ? `${edu.degree} ${t.education.in} ${edu.field}`
+                                                : edu.degree || edu.field}
                                         </span>
                                         {edu.institution && (
                                             <span className="text-[11px] text-gray-500 ml-1.5">

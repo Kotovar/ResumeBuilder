@@ -214,9 +214,9 @@ export function ModernTemplate() {
                             {education.map((edu) => (
                                 <div key={edu.id}>
                                     <p className="text-[10px] font-semibold text-gray-800 leading-tight">
-                                        {[edu.degree, edu.field]
-                                            .filter(Boolean)
-                                            .join(" · ")}
+                                        {edu.degree && edu.field
+                                            ? `${edu.degree} ${t.education.in} ${edu.field}`
+                                            : edu.degree || edu.field}
                                     </p>
                                     <p className="text-[9px] text-gray-600 mt-0.5">
                                         {edu.institution}

@@ -425,9 +425,9 @@ export function ClassicPDF({ data }: Props) {
                                     <View key={edu.id} style={S.eduItem}>
                                         <View style={S.eduTopRow}>
                                             <Text style={S.eduDegree}>
-                                                {[edu.degree, edu.field]
-                                                    .filter(Boolean)
-                                                    .join(" · ")}
+                                                {edu.degree && edu.field
+                                                    ? `${edu.degree} ${t.education.in} ${edu.field}`
+                                                    : edu.degree || edu.field}
                                             </Text>
                                             <Text style={S.eduDateLocation}>
                                                 {[

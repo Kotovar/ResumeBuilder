@@ -85,6 +85,7 @@ export interface Translations {
         phDegree: string;
         phField: string;
         phLocation: string;
+        in: string; // Connector for degree + field (e.g., "B.S. in Computer Science")
     };
     skills: {
         tip: string;
@@ -214,6 +215,7 @@ const en: Translations = {
         phDegree: "B.S.",
         phField: "Computer Science",
         phLocation: "Cambridge, MA",
+        in: "in",
     },
     skills: {
         tip: "Group skills by category. Match keywords from job descriptions to pass ATS scanners. 4–8 skills per category is optimal.",
@@ -358,6 +360,7 @@ const ru: Translations = {
         phDegree: "Бакалавр",
         phField: "Информатика",
         phLocation: "Москва",
+        in: "по специальности",
     },
     skills: {
         tip: "Группируйте навыки по категориям. Используйте ключевые слова из вакансий. 4–8 навыков на категорию — оптимально.",

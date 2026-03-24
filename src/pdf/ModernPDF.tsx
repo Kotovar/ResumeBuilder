@@ -336,7 +336,7 @@ export function ModernPDF({ data }: Props) {
                     {contactEntries.length > 0 && (
                         <>
                             <Text style={S.sidebarSectionHeader}>
-                                {"CONTACT"}
+                                {t.sections.personal.toUpperCase()}
                             </Text>
                             {contactEntries.map((entry, i) => (
                                 <View key={i} style={S.contactItem}>
@@ -434,9 +434,10 @@ export function ModernPDF({ data }: Props) {
                                                             S.sidebarEduDegree
                                                         }
                                                     >
-                                                        {[edu.degree, edu.field]
-                                                            .filter(Boolean)
-                                                            .join(" · ")}
+                                                        {edu.degree && edu.field
+                                                            ? `${edu.degree} ${t.education.in} ${edu.field}`
+                                                            : edu.degree ||
+                                                              edu.field}
                                                     </Text>
                                                     {edu.institution ? (
                                                         <Text
