@@ -1,48 +1,67 @@
-import { useCallback } from 'react';
-import type { ResumeData } from '../types/resume';
-import { generatePDF } from '../pdf/generate';
+import { useCallback } from "react";
+import { generatePDF } from "@pdf/generate";
+import type { ResumeData } from "@type/resume";
+
+function isResumeData(data: unknown): data is ResumeData {
+    return (
+        typeof data === "object" &&
+        data !== null &&
+        "personal" in data &&
+        typeof data.personal === "object" &&
+        data.personal !== null &&
+        "fullName" in data.personal
+    );
+}
 
 export function useExport(data: ResumeData) {
-  const exportPDF = useCallback(async () => {
-    try {
-      await generatePDF(data);
-    } catch (err) {
-      console.error('PDF generation failed:', err);
-      alert('PDF export failed. Please try again.');
-    }
-  }, [data]);
-
-  const exportJSON = useCallback(() => {
-    const json = JSON.stringify(data, null, 2);
-    const blob = new Blob([json], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${data.personal.fullName.replace(/\s+/g, '_') || 'resume'}_resume.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  }, [data]);
-
-  const importJSON = useCallback((onLoad: (data: ResumeData) => void) => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json,application/json';
-    input.onchange = () => {
-      const file = input.files?.[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (ev) => {
+    const exportPDF = useCallback(async () => {
         try {
-          const parsed = JSON.parse(ev.target?.result as string) as ResumeData;
-          onLoad(parsed);
-        } catch {
-          alert('Invalid JSON file — could not import resume.');
+            await generatePDF(data);
+        } catch (err) {
+            console.error("PDF generation failed:", err);
+            alert("PDF export failed. Please try again.");
         }
-      };
-      reader.readAsText(file);
-    };
-    input.click();
-  }, []);
+    }, [data]);
 
-  return { exportPDF, exportJSON, importJSON };
+    const exportJSON = useCallback(() => {
+        const json = JSON.stringify(data, null, 2);
+        const blob = new Blob([json], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${data.personal.fullName.replace(/\s+/g, "_") || "resume"}_resume.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }, [data]);
+
+    const importJSON = useCallback((onLoad: (data: ResumeData) => void) => {
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = ".json,application/json";
+        input.onchange = () => {
+            const file = input.files?.[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                try {
+                    const result = ev.target?.result;
+                    if (typeof result !== "string") return;
+                    const parsed = JSON.parse(result);
+                    if (!isResumeData(parsed)) {
+                        alert(
+                            "Invalid JSON structure — could not import resume.",
+                        );
+                        return;
+                    }
+                    onLoad(parsed);
+                } catch {
+                    alert("Invalid JSON file — could not import resume.");
+                }
+            };
+            reader.readAsText(file);
+        };
+        input.click();
+    }, []);
+
+    return { exportPDF, exportJSON, importJSON };
 }

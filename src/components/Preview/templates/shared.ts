@@ -1,5 +1,5 @@
-import type { Lang } from "../../../types/resume";
-import { getT } from "../../../i18n/translations";
+import { getT } from "@i18n/translations";
+import type { Lang } from "@type/resume";
 
 /** Format "YYYY-MM" → "Jan 2020" (localized) */
 export function fmtDate(dateStr: string, lang: Lang = "en"): string {

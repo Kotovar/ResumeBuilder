@@ -7,59 +7,31 @@ import {
     Image,
     StyleSheet,
 } from "@react-pdf/renderer";
+import { computeResumeColors, type ResumeColors } from "./colors";
+import { getT } from "../i18n/translations";
+import { formatSalary } from "../components/Preview/templates/shared";
+import { PDF_FONT_FAMILY } from "./fonts";
+import { ACCENT_HEX } from "@shared/consts";
+import {
+    ensureHttps,
+    isMainSection,
+    isSafePhoto,
+    isSidebarSection,
+    localDateRange,
+} from "./shared";
 import type {
     ResumeData,
     ExperienceEntry,
     EducationEntry,
     SkillGroup,
     ProjectEntry,
-} from "../types/resume";
-import { ACCENT_HEX, computeResumeColors, type ResumeColors } from "./colors";
-import { PDF_FONT_FAMILY } from "./fonts";
-import { getT } from "../i18n/translations";
-import { formatSalary } from "../components/Preview/templates/shared";
+} from "@type/resume";
 
 interface Props {
     data: ResumeData;
 }
 
 const SIDEBAR_WIDTH = 150;
-
-function localDateRange(
-    start: string,
-    end: string,
-    current: boolean,
-    presentLabel: string,
-    lang: "en" | "ru",
-): string {
-    const t = getT(lang);
-    const s = start
-        ? `${t.months.short[parseInt(start.split("-")[1], 10) - 1]} ${start.split("-")[0]}`
-        : "";
-    const e = current
-        ? presentLabel
-        : end
-          ? `${t.months.short[parseInt(end.split("-")[1], 10) - 1]} ${end.split("-")[0]}`
-          : "";
-    if (!s && !e) return "";
-    if (!s) return e;
-    if (!e) return s;
-    return `${s} – ${e}`;
-}
-
-function ensureHttps(url: string): string {
-    if (!url) return url;
-    if (url.startsWith("http://") || url.startsWith("https://")) return url;
-    return `https://${url}`;
-}
-
-function isSafePhoto(photo: string | undefined): boolean {
-    return (
-        typeof photo === "string" &&
-        (photo.startsWith("data:image/jpeg;base64,") ||
-            photo.startsWith("data:image/png;base64,"))
-    );
-}
 
 function makeStyles(colors: ResumeColors, fontFamily: string) {
     const { accent, sidebarBg, sidebarHeaderText, mainBorder, skillTagBg } =
@@ -73,9 +45,6 @@ function makeStyles(colors: ResumeColors, fontFamily: string) {
             paddingTop: 24,
             paddingBottom: 24,
         },
-        // Fixed sidebar background — explicit A4 height (841.89pt) because
-        // height:"100%" resolves to the content area (page minus padding),
-        // leaving a gap equal to paddingBottom at the bottom of every page.
         sidebarBgFixed: {
             position: "absolute",
             top: 0,
@@ -290,7 +259,7 @@ function makeStyles(colors: ResumeColors, fontFamily: string) {
 }
 
 export function ModernPDF({ data }: Props) {
-    const { personal, settings } = data;
+    const { personal, settings, sections } = data;
     const colors = computeResumeColors(ACCENT_HEX[settings.accentColor]);
     const fontFamily = PDF_FONT_FAMILY[settings.fontFamily];
     const t = getT(settings.lang);
@@ -350,8 +319,9 @@ export function ModernPDF({ data }: Props) {
             <Page size="A4" style={S.page}>
                 {/* Sidebar background — fixed so it repeats on every page */}
                 <View fixed style={S.sidebarBgFixed} />
-                {/* Sidebar content */}
+                {/* Sidebar content — render sections in editor order */}
                 <View style={S.sidebar}>
+                    {/* Personal info (always first in sidebar) */}
                     {isSafePhoto(personal.photo) ? (
                         <Image src={personal.photo!} style={S.sidebarPhoto} />
                     ) : null}
@@ -362,7 +332,7 @@ export function ModernPDF({ data }: Props) {
                         <Text style={S.sidebarTitle}>{personal.title}</Text>
                     ) : null}
 
-                    {/* Contact */}
+                    {/* Contact info */}
                     {contactEntries.length > 0 && (
                         <>
                             <Text style={S.sidebarSectionHeader}>
@@ -389,212 +359,346 @@ export function ModernPDF({ data }: Props) {
                         </>
                     )}
 
-                    {/* Skills */}
-                    {allSkillGroups.length > 0 && (
-                        <>
-                            <Text style={S.sidebarSectionHeader}>
-                                {t.sections.skills.toUpperCase()}
-                            </Text>
-                            {allSkillGroups.map((group: SkillGroup) => (
-                                <View
-                                    key={group.id}
-                                    style={{ marginBottom: 4 }}
-                                >
-                                    {group.category ? (
-                                        <Text
-                                            style={{
-                                                fontSize: 6.5,
-                                                color: "#9ca3af",
-                                                fontWeight: 700,
-                                                marginBottom: 2,
-                                            }}
-                                        >
-                                            {group.category.toUpperCase()}
+                    {/* Skills and Education — render in section order */}
+                    {sections
+                        .filter(
+                            (sec) =>
+                                isSidebarSection(sec.id) &&
+                                sec.id !== "personal",
+                        )
+                        .map((sec) => {
+                            if (sec.id === "skills") {
+                                return (
+                                    <View key="skills">
+                                        <Text style={S.sidebarSectionHeader}>
+                                            {t.sections.skills.toUpperCase()}
                                         </Text>
-                                    ) : null}
-                                    <View style={S.skillsWrap}>
-                                        {group.skills.map((skill, i) => (
-                                            <View key={i} style={S.skillTag}>
-                                                <Text style={S.skillTagText}>
-                                                    {skill}
-                                                </Text>
-                                            </View>
-                                        ))}
-                                    </View>
-                                </View>
-                            ))}
-                        </>
-                    )}
-
-                    {/* Education in sidebar */}
-                    {data.education.length > 0 && (
-                        <>
-                            <Text style={S.sidebarSectionHeader}>
-                                {t.sections.education.toUpperCase()}
-                            </Text>
-                            {data.education.map((edu: EducationEntry) => (
-                                <View key={edu.id} style={S.sidebarEduItem}>
-                                    <Text style={S.sidebarEduDegree}>
-                                        {[edu.degree, edu.field]
-                                            .filter(Boolean)
-                                            .join(" · ")}
-                                    </Text>
-                                    {edu.institution ? (
-                                        <Text style={S.sidebarEduInstitution}>
-                                            {edu.institution}
-                                        </Text>
-                                    ) : null}
-                                    <Text style={S.sidebarEduDate}>
-                                        {[
-                                            localDateRange(
-                                                edu.startDate,
-                                                edu.endDate,
-                                                false,
-                                                t.experience.present,
-                                                settings.lang,
+                                        {allSkillGroups.map(
+                                            (group: SkillGroup) => (
+                                                <View
+                                                    key={group.id}
+                                                    style={{ marginBottom: 4 }}
+                                                >
+                                                    {group.category ? (
+                                                        <Text
+                                                            style={{
+                                                                fontSize: 6.5,
+                                                                color: "#9ca3af",
+                                                                fontWeight: 700,
+                                                                marginBottom: 2,
+                                                            }}
+                                                        >
+                                                            {group.category.toUpperCase()}
+                                                        </Text>
+                                                    ) : null}
+                                                    <View style={S.skillsWrap}>
+                                                        {group.skills.map(
+                                                            (skill, i) => (
+                                                                <View
+                                                                    key={i}
+                                                                    style={
+                                                                        S.skillTag
+                                                                    }
+                                                                >
+                                                                    <Text
+                                                                        style={
+                                                                            S.skillTagText
+                                                                        }
+                                                                    >
+                                                                        {skill}
+                                                                    </Text>
+                                                                </View>
+                                                            ),
+                                                        )}
+                                                    </View>
+                                                </View>
                                             ),
-                                            edu.location,
-                                        ]
-                                            .filter(Boolean)
-                                            .join(" · ")}
-                                    </Text>
-                                    {edu.gpa ? (
-                                        <Text style={S.sidebarEduDate}>
-                                            GPA: {edu.gpa}
+                                        )}
+                                    </View>
+                                );
+                            }
+                            if (sec.id === "education") {
+                                return (
+                                    <View key="education">
+                                        <Text style={S.sidebarSectionHeader}>
+                                            {t.sections.education.toUpperCase()}
                                         </Text>
-                                    ) : null}
-                                </View>
-                            ))}
-                        </>
-                    )}
+                                        {data.education.map(
+                                            (edu: EducationEntry) => (
+                                                <View
+                                                    key={edu.id}
+                                                    style={S.sidebarEduItem}
+                                                >
+                                                    <Text
+                                                        style={
+                                                            S.sidebarEduDegree
+                                                        }
+                                                    >
+                                                        {[edu.degree, edu.field]
+                                                            .filter(Boolean)
+                                                            .join(" · ")}
+                                                    </Text>
+                                                    {edu.institution ? (
+                                                        <Text
+                                                            style={
+                                                                S.sidebarEduInstitution
+                                                            }
+                                                        >
+                                                            {edu.institution}
+                                                        </Text>
+                                                    ) : null}
+                                                    <Text
+                                                        style={S.sidebarEduDate}
+                                                    >
+                                                        {[
+                                                            localDateRange(
+                                                                edu.startDate,
+                                                                edu.endDate,
+                                                                false,
+                                                                t.experience
+                                                                    .present,
+                                                                settings.lang,
+                                                            ),
+                                                            edu.location,
+                                                        ]
+                                                            .filter(Boolean)
+                                                            .join(" · ")}
+                                                    </Text>
+                                                    {edu.gpa ? (
+                                                        <Text
+                                                            style={
+                                                                S.sidebarEduDate
+                                                            }
+                                                        >
+                                                            GPA: {edu.gpa}
+                                                        </Text>
+                                                    ) : null}
+                                                </View>
+                                            ),
+                                        )}
+                                    </View>
+                                );
+                            }
+                            return null;
+                        })}
                 </View>
-                {/* Main content */}
+                {/* Main content — render sections in editor order */}
                 <View style={S.main}>
-                    {/* Summary */}
-                    {data.summary && (
-                        <>
-                            <Text style={S.mainSectionHeader}>
-                                {t.sections.summary.toUpperCase()}
-                            </Text>
-                            {data.summary.split("\n").map((line, i) =>
-                                line.trim() ? (
-                                    <Text key={i} style={S.summaryParagraph}>
-                                        {line}
-                                    </Text>
-                                ) : (
-                                    <View key={i} style={{ height: 8 }} />
-                                ),
-                            )}
-                        </>
-                    )}
-
-                    {/* Experience */}
-                    {data.experience.length > 0 && (
-                        <>
-                            <Text style={S.mainSectionHeader}>
-                                {t.sections.experience.toUpperCase()}
-                            </Text>
-                            {data.experience.map((exp: ExperienceEntry) => (
-                                <View key={exp.id} style={S.expItem}>
-                                    <View style={S.expTopRow}>
-                                        <Text style={S.expPosition}>
-                                            {exp.position}
+                    {sections
+                        .filter((sec) => isMainSection(sec.id))
+                        .map((sec) => {
+                            if (sec.id === "summary") {
+                                return data.summary ? (
+                                    <View key="summary">
+                                        <Text style={S.mainSectionHeader}>
+                                            {t.sections.summary.toUpperCase()}
                                         </Text>
-                                        <Text style={S.expDateLocation}>
-                                            {[
-                                                localDateRange(
-                                                    exp.startDate,
-                                                    exp.endDate,
-                                                    exp.current,
-                                                    t.experience.present,
-                                                    settings.lang,
+                                        {data.summary
+                                            .split("\n")
+                                            .map((line, i) =>
+                                                line.trim() ? (
+                                                    <Text
+                                                        key={i}
+                                                        style={
+                                                            S.summaryParagraph
+                                                        }
+                                                    >
+                                                        {line}
+                                                    </Text>
+                                                ) : (
+                                                    <View
+                                                        key={i}
+                                                        style={{ height: 8 }}
+                                                    />
                                                 ),
-                                                exp.location,
-                                            ]
-                                                .filter(Boolean)
-                                                .join(" · ")}
-                                        </Text>
+                                            )}
                                     </View>
-                                    {exp.company ? (
-                                        <Text style={S.expCompany}>
-                                            {exp.company}
+                                ) : null;
+                            }
+                            if (sec.id === "experience") {
+                                return data.experience.length > 0 ? (
+                                    <View key="experience">
+                                        <Text style={S.mainSectionHeader}>
+                                            {t.sections.experience.toUpperCase()}
                                         </Text>
-                                    ) : null}
-                                    {exp.description
-                                        ? exp.description
-                                              .split("\n")
-                                              .map((line, i) => (
-                                                  <Text
-                                                      key={i}
-                                                      style={S.expDescription}
-                                                  >
-                                                      {line}
-                                                  </Text>
-                                              ))
-                                        : null}
-                                    {exp.highlights
-                                        .filter(Boolean)
-                                        .map((h, i) => (
-                                            <View key={i} style={S.bullet}>
-                                                <Text style={S.bulletDot}>
-                                                    •
-                                                </Text>
-                                                <Text style={S.bulletText}>
-                                                    {h}
-                                                </Text>
-                                            </View>
-                                        ))}
-                                </View>
-                            ))}
-                        </>
-                    )}
-
-                    {/* Projects */}
-                    {data.projects.length > 0 && (
-                        <>
-                            <Text style={S.mainSectionHeader}>
-                                {t.sections.projects.toUpperCase()}
-                            </Text>
-                            {data.projects.map((proj: ProjectEntry) => (
-                                <View key={proj.id} style={S.projectItem}>
-                                    <View style={S.projectTopRow}>
-                                        <Text style={S.projectName}>
-                                            {proj.name}
-                                        </Text>
-                                        {proj.url ? (
-                                            <Link src={ensureHttps(proj.url)}>
-                                                <Text style={S.projectUrl}>
-                                                    {proj.url}
-                                                </Text>
-                                            </Link>
-                                        ) : null}
+                                        {data.experience.map(
+                                            (exp: ExperienceEntry) => (
+                                                <View
+                                                    key={exp.id}
+                                                    style={S.expItem}
+                                                >
+                                                    <View style={S.expTopRow}>
+                                                        <Text
+                                                            style={
+                                                                S.expPosition
+                                                            }
+                                                        >
+                                                            {exp.position}
+                                                        </Text>
+                                                        <Text
+                                                            style={
+                                                                S.expDateLocation
+                                                            }
+                                                        >
+                                                            {[
+                                                                localDateRange(
+                                                                    exp.startDate,
+                                                                    exp.endDate,
+                                                                    exp.current,
+                                                                    t.experience
+                                                                        .present,
+                                                                    settings.lang,
+                                                                ),
+                                                                exp.location,
+                                                            ]
+                                                                .filter(Boolean)
+                                                                .join(" · ")}
+                                                        </Text>
+                                                    </View>
+                                                    {exp.company ? (
+                                                        <Text
+                                                            style={S.expCompany}
+                                                        >
+                                                            {exp.company}
+                                                        </Text>
+                                                    ) : null}
+                                                    {exp.description
+                                                        ? exp.description
+                                                              .split("\n")
+                                                              .map(
+                                                                  (line, i) => (
+                                                                      <Text
+                                                                          key={
+                                                                              i
+                                                                          }
+                                                                          style={
+                                                                              S.expDescription
+                                                                          }
+                                                                      >
+                                                                          {line}
+                                                                      </Text>
+                                                                  ),
+                                                              )
+                                                        : null}
+                                                    {exp.highlights
+                                                        .filter(Boolean)
+                                                        .map((h, i) => (
+                                                            <View
+                                                                key={i}
+                                                                style={S.bullet}
+                                                            >
+                                                                <Text
+                                                                    style={
+                                                                        S.bulletDot
+                                                                    }
+                                                                >
+                                                                    •
+                                                                </Text>
+                                                                <Text
+                                                                    style={
+                                                                        S.bulletText
+                                                                    }
+                                                                >
+                                                                    {h}
+                                                                </Text>
+                                                            </View>
+                                                        ))}
+                                                </View>
+                                            ),
+                                        )}
                                     </View>
-                                    {proj.technologies.length > 0 ? (
-                                        <Text style={S.projectTech}>
-                                            {proj.technologies.join(", ")}
+                                ) : null;
+                            }
+                            if (sec.id === "projects") {
+                                return data.projects.length > 0 ? (
+                                    <View key="projects">
+                                        <Text style={S.mainSectionHeader}>
+                                            {t.sections.projects.toUpperCase()}
                                         </Text>
-                                    ) : null}
-                                    {proj.description ? (
-                                        <Text style={S.projectDesc}>
-                                            {proj.description}
-                                        </Text>
-                                    ) : null}
-                                    {proj.highlights
-                                        .filter(Boolean)
-                                        .map((h, i) => (
-                                            <View key={i} style={S.bullet}>
-                                                <Text style={S.bulletDot}>
-                                                    •
-                                                </Text>
-                                                <Text style={S.bulletText}>
-                                                    {h}
-                                                </Text>
-                                            </View>
-                                        ))}
-                                </View>
-                            ))}
-                        </>
-                    )}
+                                        {data.projects.map(
+                                            (proj: ProjectEntry) => (
+                                                <View
+                                                    key={proj.id}
+                                                    style={S.projectItem}
+                                                >
+                                                    <View
+                                                        style={S.projectTopRow}
+                                                    >
+                                                        <Text
+                                                            style={
+                                                                S.projectName
+                                                            }
+                                                        >
+                                                            {proj.name}
+                                                        </Text>
+                                                        {proj.url ? (
+                                                            <Link
+                                                                src={ensureHttps(
+                                                                    proj.url,
+                                                                )}
+                                                            >
+                                                                <Text
+                                                                    style={
+                                                                        S.projectUrl
+                                                                    }
+                                                                >
+                                                                    {proj.url}
+                                                                </Text>
+                                                            </Link>
+                                                        ) : null}
+                                                    </View>
+                                                    {proj.technologies.length >
+                                                    0 ? (
+                                                        <Text
+                                                            style={
+                                                                S.projectTech
+                                                            }
+                                                        >
+                                                            {proj.technologies.join(
+                                                                ", ",
+                                                            )}
+                                                        </Text>
+                                                    ) : null}
+                                                    {proj.description ? (
+                                                        <Text
+                                                            style={
+                                                                S.projectDesc
+                                                            }
+                                                        >
+                                                            {proj.description}
+                                                        </Text>
+                                                    ) : null}
+                                                    {proj.highlights
+                                                        .filter(Boolean)
+                                                        .map((h, i) => (
+                                                            <View
+                                                                key={i}
+                                                                style={S.bullet}
+                                                            >
+                                                                <Text
+                                                                    style={
+                                                                        S.bulletDot
+                                                                    }
+                                                                >
+                                                                    •
+                                                                </Text>
+                                                                <Text
+                                                                    style={
+                                                                        S.bulletText
+                                                                    }
+                                                                >
+                                                                    {h}
+                                                                </Text>
+                                                            </View>
+                                                        ))}
+                                                </View>
+                                            ),
+                                        )}
+                                    </View>
+                                ) : null;
+                            }
+                            return null;
+                        })}
                 </View>
             </Page>
         </Document>

@@ -9,11 +9,11 @@ import type {
     ProjectEntry,
     SectionConfig,
     ResumeSettings,
-} from "../types/resume";
-import { createDefaultResume } from "../data/defaults";
+} from "@type/resume";
+import { createDefaultResume } from "@data/defaults";
 
 // ── Helpers ───────────────────────────────────────────────
-function uid(): string {
+function uid() {
     return crypto.randomUUID();
 }
 
@@ -200,7 +200,9 @@ export const useResumeStore = create<ResumeStore>()(
             toggleSectionVisibility: (id) =>
                 set((s) => ({
                     sections: s.sections.map((sec) =>
-                        sec.id === id ? { ...sec, visible: !sec.visible } : sec,
+                        sec.id === id && sec.id !== "personal"
+                            ? { ...sec, visible: !sec.visible }
+                            : sec,
                     ),
                 })),
 
@@ -224,27 +226,18 @@ export const useResumeStore = create<ResumeStore>()(
                     // Add description field to existing experience entries
                     state.experience = (state.experience ?? []).map((e) => ({
                         ...e,
-                        description:
-                            (e as ExperienceEntry & { description?: string })
-                                .description ?? "",
+                        description: e.description ?? "",
                     }));
                     // Add lang to settings
                     state.settings = {
                         ...state.settings,
-                        lang:
-                            ((
-                                state.settings as ResumeSettings & {
-                                    lang?: string;
-                                }
-                            ).lang as ResumeSettings["lang"]) ?? "en",
+                        lang: state.settings.lang ?? "en",
                         // Migrate removed fonts to 'ptsans'
                         fontFamily: ["inter", "roboto", "lora"].includes(
-                            state.settings.fontFamily as string,
+                            state.settings.fontFamily,
                         )
                             ? "ptsans"
-                            : ((state.settings
-                                  .fontFamily as ResumeSettings["fontFamily"]) ??
-                              "ptsans"),
+                            : (state.settings.fontFamily ?? "ptsans"),
                     };
                 }
                 return state;

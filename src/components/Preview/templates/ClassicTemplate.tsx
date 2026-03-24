@@ -1,14 +1,7 @@
-import { useResumeStore } from "../../../store/resumeStore";
-import { getT } from "../../../i18n/translations";
+import { useResumeStore } from "@store/resumeStore";
+import { getT } from "@i18n/translations";
 import { dateRange, formatSalary } from "./shared";
-
-const FONT_STACK: Record<string, string> = {
-    inter: "'Inter', sans-serif",
-    ptsans: "'PT Sans', sans-serif",
-    roboto: "'Roboto', sans-serif",
-    lora: "'Lora', serif",
-    ptserif: "'PT Serif', serif",
-};
+import { FONT_STACK } from "@shared/consts";
 
 const SectionHeader = ({ title }: { title: string }) => (
     <div
@@ -36,7 +29,10 @@ export function ClassicTemplate() {
         settings,
     } = useResumeStore();
     const t = getT(settings.lang);
-    const visibleSections = sections.filter((s) => s.visible);
+    // Personal section is always visible, filter only for other sections
+    const visibleSections = sections.filter(
+        (s) => s.id === "personal" || s.visible,
+    );
 
     const renderSection = (id: string) => {
         switch (id) {
@@ -223,12 +219,11 @@ export function ClassicTemplate() {
         <div
             className="bg-white"
             style={{
-                fontFamily: FONT_STACK[settings.fontFamily] ?? FONT_STACK.inter,
+                fontFamily: FONT_STACK[settings.fontFamily],
                 padding: "40px 48px",
                 minHeight: "297mm",
             }}
         >
-            {/* Header */}
             <header className="mb-5 flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                     <h1 className="text-[26px] font-bold text-gray-900 leading-tight tracking-tight">

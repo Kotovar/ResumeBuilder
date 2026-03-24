@@ -6,21 +6,7 @@ import { PreviewPanel } from "./components/Preview/PreviewPanel";
 import { useResumeStore } from "./store/resumeStore";
 import { useExport } from "./hooks/useExport";
 import { getT } from "./i18n/translations";
-import type { AccentColor, FontFamily } from "./types/resume";
-
-const ACCENT_HEX: Record<AccentColor, string> = {
-    blue: "#2563eb",
-    green: "#16a34a",
-    purple: "#9333ea",
-    rose: "#e11d48",
-    slate: "#475569",
-};
-
-const FONT_STACK: Record<FontFamily, string> = {
-    ptsans: "'PT Sans', sans-serif",
-    ptserif: "'PT Serif', serif",
-    ptmono: "'PT Mono', monospace",
-};
+import { FONT_STACK, ACCENT_HEX } from "@shared/consts";
 
 export default function App() {
     const store = useResumeStore();

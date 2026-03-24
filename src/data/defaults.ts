@@ -1,4 +1,4 @@
-import type { ResumeData } from "../types/resume";
+import type { ResumeData } from "@type/resume";
 
 /** Creates a fresh default resume with new UUIDs each call. */
 export function createDefaultResume(): ResumeData {

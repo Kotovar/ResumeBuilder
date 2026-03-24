@@ -1,19 +1,12 @@
-import { useResumeStore } from "../../../store/resumeStore";
-import { getT } from "../../../i18n/translations";
+import { useResumeStore } from "@store/resumeStore";
+import { getT } from "@i18n/translations";
 import { dateRange, formatSalary } from "./shared";
-
-const FONT_STACK: Record<string, string> = {
-    inter: "'Inter', sans-serif",
-    ptsans: "'PT Sans', sans-serif",
-    roboto: "'Roboto', sans-serif",
-    lora: "'Lora', serif",
-    ptserif: "'PT Serif', serif",
-};
+import { FONT_STACK } from "@shared/consts";
 
 const SidebarHeader = ({ title }: { title: string }) => (
     <h2
         className="text-[9px] font-bold uppercase tracking-[0.18em] mb-2 pb-0.5 border-b border-white/30"
-        style={{ color: "color-mix(in srgb, var(--accent) 20%, white 80%)" }}
+        style={{ color: "color-mix(in srgb, var(--accent) 50%, white 80%)" }}
     >
         {title}
     </h2>
@@ -27,7 +20,7 @@ const MainHeader = ({ title }: { title: string }) => (
         }}
     >
         <h2
-            className="text-[10px] font-bold uppercase tracking-[0.15em]"
+            className="text-[10px] font-bold uppercase tracking-[0.15em] "
             style={{ color: "var(--accent)" }}
         >
             {title}
@@ -49,9 +42,10 @@ export function ModernTemplate() {
     const t = getT(settings.lang);
 
     const isVisible = (id: string) =>
-        sections.find((s) => s.id === id)?.visible ?? false;
+        id === "personal"
+            ? true
+            : (sections.find((s) => s.id === id)?.visible ?? false);
 
-    // Contact items with optional href for links
     const contactItems = [
         {
             label: t.personal.email,
@@ -113,7 +107,7 @@ export function ModernTemplate() {
         <div
             className="bg-white flex"
             style={{
-                fontFamily: FONT_STACK[settings.fontFamily] ?? FONT_STACK.inter,
+                fontFamily: FONT_STACK[settings.fontFamily],
                 minHeight: "297mm",
             }}
         >
@@ -132,13 +126,7 @@ export function ModernTemplate() {
                     <img
                         src={personal.photo}
                         alt="profile"
-                        style={{
-                            width: 100,
-                            height: 100,
-                            borderRadius: 6,
-                            objectFit: "cover",
-                            // alignSelf: "center",
-                        }}
+                        className="w-25 h-25 rounded-md object-cover"
                     />
                 )}
 

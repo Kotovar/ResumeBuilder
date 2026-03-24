@@ -7,57 +7,22 @@ import {
     Image,
     StyleSheet,
 } from "@react-pdf/renderer";
+import { computeResumeColors } from "./colors";
+import { getT } from "@i18n/translations";
+import { formatSalary } from "@components/Preview/templates/shared";
+import { PDF_FONT_FAMILY } from "./fonts";
+import { ACCENT_HEX } from "@shared/consts";
+import { ensureHttps, isSafePhoto, localDateRange } from "./shared";
 import type {
     ResumeData,
     ExperienceEntry,
     EducationEntry,
     SkillGroup,
     ProjectEntry,
-} from "../types/resume";
-import { ACCENT_HEX, computeResumeColors } from "./colors";
-import { PDF_FONT_FAMILY } from "./fonts";
-import { getT } from "../i18n/translations";
-import { formatSalary } from "../components/Preview/templates/shared";
+} from "@type/resume";
 
 interface Props {
     data: ResumeData;
-}
-
-/** Localized date range using the translated "Present" label */
-function localDateRange(
-    start: string,
-    end: string,
-    current: boolean,
-    presentLabel: string,
-    lang: "en" | "ru",
-): string {
-    const t = getT(lang);
-    const s = start
-        ? `${t.months.short[parseInt(start.split("-")[1], 10) - 1]} ${start.split("-")[0]}`
-        : "";
-    const e = current
-        ? presentLabel
-        : end
-          ? `${t.months.short[parseInt(end.split("-")[1], 10) - 1]} ${end.split("-")[0]}`
-          : "";
-    if (!s && !e) return "";
-    if (!s) return e;
-    if (!e) return s;
-    return `${s} – ${e}`;
-}
-
-function ensureHttps(url: string): string {
-    if (!url) return url;
-    if (url.startsWith("http://") || url.startsWith("https://")) return url;
-    return `https://${url}`;
-}
-
-function isSafePhoto(photo: string | undefined): boolean {
-    return (
-        typeof photo === "string" &&
-        (photo.startsWith("data:image/jpeg;base64,") ||
-            photo.startsWith("data:image/png;base64,"))
-    );
 }
 
 function makeStyles(accent: string, fontFamily: string) {
@@ -314,14 +279,13 @@ export function ClassicPDF({ data }: Props) {
         contactItems.push({ label: `${salaryLabel}: ${salaryFormatted}` });
     }
 
-    const visibleSections = sections.filter(
-        (s) => s.visible && s.id !== "personal",
-    );
+    // PDF always includes all sections (ignore visibility flags)
+    // Personal info is rendered separately in the header
 
     return (
         <Document>
             <Page size="A4" style={S.page}>
-                {/* Header */}
+                {/* Header - Personal Info (always rendered) */}
                 <View style={S.headerRow}>
                     <View style={S.headerLeft}>
                         {personal.fullName ? (
@@ -356,8 +320,10 @@ export function ClassicPDF({ data }: Props) {
                 </View>
                 <View style={S.divider} />
 
-                {/* Sections */}
-                {visibleSections.map((sec) => {
+                {/* Sections - render all sections from order, ignoring visibility */}
+                {sections.map((sec) => {
+                    // Personal section is rendered in header, skip here
+                    if (sec.id === "personal") return null;
                     if (sec.id === "summary") {
                         return (
                             <View key="summary">

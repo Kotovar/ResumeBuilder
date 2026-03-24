@@ -1,14 +1,8 @@
 import { useState } from "react";
-import { useResumeStore } from "../../store/resumeStore";
-import { useT } from "../../i18n/useT";
-import type {
-    AccentColor,
-    FontFamily,
-    Lang,
-    ResumeSettings,
-    TemplateType,
-} from "../../types/resume";
-import type { Translations } from "../../i18n/translations";
+import { useResumeStore } from "@store/resumeStore";
+import { useT } from "@i18n/useT";
+import type { Translations } from "@i18n/translations";
+import type { AccentColor, FontFamily, ResumeSettings } from "@type/resume";
 
 const ACCENT_OPTIONS: { value: AccentColor; hex: string }[] = [
     { value: "blue", hex: "#2563eb" },
@@ -24,14 +18,15 @@ const FONT_OPTIONS: { value: FontFamily; label: string }[] = [
     { value: "ptmono", label: "PT Mono" },
 ];
 
+const LANG = ["en", "ru"] as const;
+const TEMPLATE = ["classic", "modern"] as const;
+
 interface Props {
     onExportPDF: () => void;
     onExportJSON: () => void;
     onImportJSON: () => void;
     onReset: () => void;
 }
-
-// ── Shared sub-components used in both desktop and mobile menu ──
 
 interface PickerProps {
     t: Translations;
@@ -46,7 +41,7 @@ function TemplatePicker({ t, settings, updateSettings }: PickerProps) {
                 {t.toolbar.template}
             </span>
             <div className="flex rounded-md overflow-hidden border border-gray-200">
-                {(["classic", "modern"] as TemplateType[]).map((tmpl) => (
+                {TEMPLATE.map((tmpl) => (
                     <button
                         key={tmpl}
                         type="button"
@@ -128,7 +123,7 @@ function LangPicker({ t, settings, updateSettings }: PickerProps) {
                 {t.toolbar.language}
             </span>
             <div className="flex rounded-md overflow-hidden border border-gray-200">
-                {(["en", "ru"] as Lang[]).map((lng) => (
+                {LANG.map((lng) => (
                     <button
                         key={lng}
                         type="button"
@@ -150,7 +145,6 @@ function LangPicker({ t, settings, updateSettings }: PickerProps) {
     );
 }
 
-// ── Main Toolbar ───────────────────────────────────────────
 export function Toolbar({
     onExportPDF,
     onExportJSON,
@@ -165,14 +159,11 @@ export function Toolbar({
 
     return (
         <div className="relative">
-            {/* ── Main bar ─────────────────────────────────── */}
             <div className="h-14 px-4 flex items-center gap-3">
-                {/* Brand */}
                 <span className="font-bold text-gray-800 text-[15px] tracking-tight shrink-0">
                     {t.toolbar.brand}
                 </span>
 
-                {/* Desktop controls — hidden on mobile */}
                 <div className="hidden md:flex items-center gap-3 lg:gap-5">
                     <div className="h-5 w-px bg-gray-200" />
                     <TemplatePicker {...pickerProps} />
@@ -183,11 +174,7 @@ export function Toolbar({
                     <div className="h-5 w-px bg-gray-200" />
                     <LangPicker {...pickerProps} />
                 </div>
-
-                {/* Spacer */}
                 <div className="flex-1" />
-
-                {/* Action buttons — always visible */}
                 <div className="hidden md:flex items-center gap-2">
                     <button
                         type="button"
@@ -225,7 +212,6 @@ export function Toolbar({
                     {t.toolbar.exportPDF}
                 </button>
 
-                {/* Mobile burger — hidden on md+ */}
                 <button
                     type="button"
                     onClick={() => setMenuOpen((o) => !o)}
@@ -246,16 +232,12 @@ export function Toolbar({
                 </button>
             </div>
 
-            {/* ── Mobile dropdown ───────────────────────────── */}
             {menuOpen && (
                 <>
-                    {/* Backdrop */}
                     <div
                         className="md:hidden fixed inset-0 z-10"
                         onClick={() => setMenuOpen(false)}
                     />
-
-                    {/* Drawer */}
                     <div
                         className="md:hidden absolute top-full left-0 right-0 z-20
             bg-white border-b border-gray-200 shadow-lg px-4 py-4 flex flex-col gap-4"

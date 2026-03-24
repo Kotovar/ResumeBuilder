@@ -1,5 +1,5 @@
 import { Font } from "@react-pdf/renderer";
-import type { FontFamily } from "../types/resume";
+import type { FontFamily } from "@type/resume";
 
 let registered = false;
 

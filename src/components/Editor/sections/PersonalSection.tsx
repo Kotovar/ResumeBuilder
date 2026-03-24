@@ -1,18 +1,27 @@
-import { useRef } from "react";
-import { useResumeStore } from "../../../store/resumeStore";
-import { useT } from "../../../i18n/useT";
+import { useRef, type ChangeEvent } from "react";
+import { useResumeStore } from "@store/resumeStore";
+import { useT } from "@i18n/useT";
 import { FormField } from "../ui/FormField";
 import { TipBox } from "../ui/TipBox";
 
 const PHOTO_MAX_PX = 300;
 const PHOTO_QUALITY = 0.85;
-const ALLOWED_TYPES = ['image/jpeg', 'image/png'];
+const ALLOWED_TYPES = ["image/jpeg", "image/png"];
+
+const CURRENCY_OPTIONS: { value: CurrencyValue; label: string }[] = [
+    { value: "USD", label: "USD ($)" },
+    { value: "RUB", label: "RUB (₽)" },
+];
+
+type CurrencyValue = "USD" | "RUB";
 
 function resizeToBase64(file: File): Promise<string> {
     return new Promise((resolve) => {
         const reader = new FileReader();
         reader.onload = (ev) => {
-            const src = ev.target?.result as string;
+            const result = ev.target?.result;
+            if (!result || typeof result !== "string") return;
+            const src = result;
             const img = new Image();
             img.onload = () => {
                 const scale = Math.min(
@@ -43,7 +52,7 @@ export function PersonalSection() {
     const upd = (k: keyof typeof personal) => (v: string) =>
         updatePersonal({ [k]: v });
 
-    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
         if (!ALLOWED_TYPES.includes(file.type)) return;
@@ -56,7 +65,6 @@ export function PersonalSection() {
         <div className="flex flex-col gap-4">
             <TipBox>{p.tip}</TipBox>
 
-            {/* Photo upload */}
             <div className="flex flex-col gap-1.5">
                 <span className="text-xs font-medium text-gray-600">
                     {p.photo}
@@ -169,7 +177,7 @@ export function PersonalSection() {
                     onChange={upd("github")}
                     placeholder={p.phGithub}
                 />
-                {/* Salary */}
+
                 <div className="flex flex-col gap-1">
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
                         {p.salaryAmount}
@@ -177,13 +185,19 @@ export function PersonalSection() {
                     <input
                         type="number"
                         min={0}
-                        value={personal.salary?.amount ?? ''}
+                        value={personal.salary?.amount ?? ""}
                         onChange={(e) => {
                             const amount = parseInt(e.target.value, 10);
                             updatePersonal({
-                                salary: amount > 0
-                                    ? { amount, currency: personal.salary?.currency ?? 'USD' }
-                                    : undefined,
+                                salary:
+                                    amount > 0
+                                        ? {
+                                              amount,
+                                              currency:
+                                                  personal.salary?.currency ??
+                                                  "USD",
+                                          }
+                                        : undefined,
                             });
                         }}
                         placeholder={p.salaryPlaceholder}
@@ -195,17 +209,25 @@ export function PersonalSection() {
                         {p.salaryCurrency}
                     </label>
                     <select
-                        value={personal.salary?.currency ?? 'USD'}
+                        value={personal.salary?.currency ?? "USD"}
                         onChange={(e) => {
-                            const currency = e.target.value as 'RUB' | 'USD';
-                            if (personal.salary) {
-                                updatePersonal({ salary: { ...personal.salary, currency } });
+                            const currency = e.target.value;
+                            if (
+                                personal.salary &&
+                                (currency === "USD" || currency === "RUB")
+                            ) {
+                                updatePersonal({
+                                    salary: { ...personal.salary, currency },
+                                });
                             }
                         }}
                         className="w-full px-3 py-2 text-sm border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition-colors"
                     >
-                        <option value="USD">USD ($)</option>
-                        <option value="RUB">RUB (₽)</option>
+                        {CURRENCY_OPTIONS.map((c) => (
+                            <option key={c.value} value={c.value}>
+                                {c.label}
+                            </option>
+                        ))}
                     </select>
                 </div>
             </div>

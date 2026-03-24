@@ -53,7 +53,6 @@ function SortableTag({ id, tag, onRemove }: SortableTagProps) {
             className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium
         rounded-full select-none touch-none"
         >
-            {/* drag handle — grip dots */}
             <span
                 {...attributes}
                 {...listeners}
@@ -84,7 +83,6 @@ export function TagInput({
 }: Props) {
     const [input, setInput] = useState("");
 
-    // Stable IDs: tag value + index to handle duplicate tag names safely
     const itemIds = tags.map((t, i) => `${t}__${i}`);
 
     const commit = () => {
@@ -116,8 +114,8 @@ export function TagInput({
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event;
         if (!over || active.id === over.id) return;
-        const from = itemIds.indexOf(active.id as string);
-        const to = itemIds.indexOf(over.id as string);
+        const from = itemIds.indexOf(String(active.id));
+        const to = itemIds.indexOf(String(over.id));
         if (from !== -1 && to !== -1) {
             onChange(arrayMove(tags, from, to));
         }

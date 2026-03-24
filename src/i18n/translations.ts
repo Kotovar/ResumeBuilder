@@ -1,6 +1,5 @@
-import type { Lang, SectionId } from "../types/resume";
+import type { Lang, SectionId } from "@type/resume";
 
-// ── Translation shape (explicit interface → all values are string) ─
 export interface Translations {
     toolbar: {
         brand: string;
@@ -408,7 +407,6 @@ const ru: Translations = {
     },
 };
 
-// ── Public API ─────────────────────────────────────────────
 export const translations: Record<Lang, Translations> = { en, ru };
 
 export function getT(lang: Lang): Translations {
