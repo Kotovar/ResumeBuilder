@@ -1,19 +1,16 @@
 import { useCallback } from 'react';
 import type { ResumeData } from '../types/resume';
+import { generatePDF } from '../pdf/generate';
 
-/**
- * PDF export — portal approach.
- *
- * #resume-print-container lives in index.html as a permanent sibling of #root.
- * App.tsx portals the live template into it via createPortal — real React DOM,
- * never inside any transform context. window.print() targets that container
- * directly; no cloning required, so text stays vector (selectable/searchable)
- * and links remain clickable in the PDF.
- */
 export function useExport(data: ResumeData) {
-  const exportPDF = useCallback(() => {
-    window.print();
-  }, []);
+  const exportPDF = useCallback(async () => {
+    try {
+      await generatePDF(data);
+    } catch (err) {
+      console.error('PDF generation failed:', err);
+      alert('PDF export failed. Please try again.');
+    }
+  }, [data]);
 
   const exportJSON = useCallback(() => {
     const json = JSON.stringify(data, null, 2);

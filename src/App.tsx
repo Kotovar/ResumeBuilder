@@ -1,11 +1,8 @@
 import { useEffect } from 'react';
-import { createPortal } from 'react-dom';
 import { AppLayout } from './components/Layout/AppLayout';
 import { Toolbar } from './components/Layout/Toolbar';
 import { EditorPanel } from './components/Editor/EditorPanel';
 import { PreviewPanel } from './components/Preview/PreviewPanel';
-import { ClassicTemplate } from './components/Preview/templates/ClassicTemplate';
-import { ModernTemplate } from './components/Preview/templates/ModernTemplate';
 import { useResumeStore } from './store/resumeStore';
 import { useExport } from './hooks/useExport';
 import { getT } from './i18n/translations';
@@ -45,24 +42,18 @@ export default function App() {
     if (window.confirm(t.confirm.reset)) resetResume();
   };
 
-  const PrintTemplate = settings.template === 'modern' ? ModernTemplate : ClassicTemplate;
-  const printContainer = document.getElementById('resume-print-container');
-
   return (
-    <>
-      <AppLayout
-        toolbar={
-          <Toolbar
-            onExportPDF={exportPDF}
-            onExportJSON={exportJSON}
-            onImportJSON={() => importJSON(loadResume)}
-            onReset={handleReset}
-          />
-        }
-        editor={<EditorPanel />}
-        preview={<PreviewPanel />}
-      />
-      {printContainer && createPortal(<PrintTemplate />, printContainer)}
-    </>
+    <AppLayout
+      toolbar={
+        <Toolbar
+          onExportPDF={exportPDF}
+          onExportJSON={exportJSON}
+          onImportJSON={() => importJSON(loadResume)}
+          onReset={handleReset}
+        />
+      }
+      editor={<EditorPanel />}
+      preview={<PreviewPanel />}
+    />
   );
 }
