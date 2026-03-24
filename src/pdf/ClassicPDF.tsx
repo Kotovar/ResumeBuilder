@@ -118,6 +118,12 @@ function makeStyles(accent: string, fontFamily: string) {
             color: "#374151",
             lineHeight: 1.5,
         },
+        summaryParagraph: {
+            fontSize: 9,
+            color: "#374151",
+            lineHeight: 1.5,
+            marginBottom: 8,
+        },
         // Experience
         expItem: {
             marginBottom: 8,
@@ -351,16 +357,21 @@ export function ClassicPDF({ data }: Props) {
                                     {t.sections.summary.toUpperCase()}
                                 </Text>
                                 {data.summary
-                                    ? data.summary
-                                          .split("\n")
-                                          .map((line, i) => (
+                                    ? data.summary.split("\n").map((line, i) =>
+                                          line.trim() ? (
                                               <Text
                                                   key={i}
-                                                  style={S.summaryText}
+                                                  style={S.summaryParagraph}
                                               >
                                                   {line}
                                               </Text>
-                                          ))
+                                          ) : (
+                                              <View
+                                                  key={i}
+                                                  style={{ height: 8 }}
+                                              />
+                                          ),
+                                      )
                                     : null}
                             </View>
                         );
@@ -373,11 +384,7 @@ export function ClassicPDF({ data }: Props) {
                                     {t.sections.experience.toUpperCase()}
                                 </Text>
                                 {data.experience.map((exp: ExperienceEntry) => (
-                                    <View
-                                        key={exp.id}
-                                        style={S.expItem}
-
-                                    >
+                                    <View key={exp.id} style={S.expItem}>
                                         <View style={S.expTopRow}>
                                             <Text style={S.expPosition}>
                                                 {exp.position}
@@ -440,11 +447,7 @@ export function ClassicPDF({ data }: Props) {
                                     {t.sections.education.toUpperCase()}
                                 </Text>
                                 {data.education.map((edu: EducationEntry) => (
-                                    <View
-                                        key={edu.id}
-                                        style={S.eduItem}
-
-                                    >
+                                    <View key={edu.id} style={S.eduItem}>
                                         <View style={S.eduTopRow}>
                                             <Text style={S.eduDegree}>
                                                 {[edu.degree, edu.field]
@@ -508,11 +511,7 @@ export function ClassicPDF({ data }: Props) {
                                     {t.sections.projects.toUpperCase()}
                                 </Text>
                                 {data.projects.map((proj: ProjectEntry) => (
-                                    <View
-                                        key={proj.id}
-                                        style={S.projectItem}
-
-                                    >
+                                    <View key={proj.id} style={S.projectItem}>
                                         <View style={S.projectTopRow}>
                                             <Text style={S.projectName}>
                                                 {proj.name}

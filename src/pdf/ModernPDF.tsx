@@ -195,6 +195,12 @@ function makeStyles(colors: ResumeColors, fontFamily: string) {
             color: "#374151",
             lineHeight: 1.5,
         },
+        summaryParagraph: {
+            fontSize: 9,
+            color: "#374151",
+            lineHeight: 1.5,
+            marginBottom: 8,
+        },
         // Experience
         expItem: {
             marginBottom: 8,
@@ -461,11 +467,15 @@ export function ModernPDF({ data }: Props) {
                             <Text style={S.mainSectionHeader}>
                                 {t.sections.summary.toUpperCase()}
                             </Text>
-                            {data.summary.split("\n").map((line, i) => (
-                                <Text key={i} style={S.summaryText}>
-                                    {line}
-                                </Text>
-                            ))}
+                            {data.summary.split("\n").map((line, i) =>
+                                line.trim() ? (
+                                    <Text key={i} style={S.summaryParagraph}>
+                                        {line}
+                                    </Text>
+                                ) : (
+                                    <View key={i} style={{ height: 8 }} />
+                                ),
+                            )}
                         </>
                     )}
 
