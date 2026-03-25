@@ -11,23 +11,33 @@ type MainSectionId = (typeof MAIN_SECTIONS)[number];
 
 /**
  * Format a date range for PDF display.
+ * Handles undefined values and year-only dates (e.g., "2008" or "2008-09").
  */
 export function localDateRange(
-    start: string,
-    end: string,
+    start: string | undefined,
+    end: string | undefined,
     current: boolean,
     presentLabel: string,
     lang: Lang,
 ): string {
     const t = getT(lang);
-    const s = start
-        ? `${t.months.short[parseInt(start.split("-")[1], 10) - 1]} ${start.split("-")[0]}`
-        : "";
-    const e = current
-        ? presentLabel
-        : end
-          ? `${t.months.short[parseInt(end.split("-")[1], 10) - 1]} ${end.split("-")[0]}`
-          : "";
+
+    const formatDate = (date: string | undefined): string => {
+        if (!date) return "";
+        const parts = date.split("-");
+        const year = parts[0];
+        const month = parts[1];
+        if (!year) return "";
+        if (!month) return year; // Year only
+        const monthIndex = parseInt(month, 10) - 1;
+        const monthName = t.months.short[monthIndex];
+        if (!monthName) return year; // Invalid month, show year only
+        return `${monthName} ${year}`;
+    };
+
+    const s = formatDate(start);
+    const e = current ? presentLabel : formatDate(end);
+
     if (!s && !e) return "";
     if (!s) return e;
     if (!e) return s;
