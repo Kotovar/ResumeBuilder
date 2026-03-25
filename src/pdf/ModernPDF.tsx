@@ -372,7 +372,8 @@ export function ModernPDF({ data }: Props) {
                         .filter(
                             (sec) =>
                                 isSidebarSection(sec.id) &&
-                                sec.id !== "personal",
+                                sec.id !== "personal" &&
+                                sec.visible,
                         )
                         .map((sec) => {
                             if (sec.id === "skills") {
@@ -494,7 +495,7 @@ export function ModernPDF({ data }: Props) {
                 {/* Main content — render sections in editor order */}
                 <View style={S.main}>
                     {sections
-                        .filter((sec) => isMainSection(sec.id))
+                        .filter((sec) => isMainSection(sec.id) && sec.visible)
                         .map((sec) => {
                             if (sec.id === "summary") {
                                 return data.summary ? (
